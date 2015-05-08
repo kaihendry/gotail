@@ -1,0 +1,53 @@
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"time"
+)
+
+type broker struct {
+	msg chan string
+}
+
+func (b *broker) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+	// to make sure the writer supports flushing
+	f, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "Streaming unsupported", http.StatusInternalServerError)
+		return
+	}
+
+	go func() {
+		for {
+			content := <-b.msg
+			fmt.Fprintf(w, content)
+			f.Flush()
+		}
+	}()
+}
+
+func main() {
+
+	b := &broker{
+		msg: make(chan string),
+	}
+
+	go func() {
+		for i := 0; i <= 100; i++ {
+			b.msg <- "hello"
+			fmt.Println("yes")
+			time.Sleep(time.Second * 5)
+		}
+	}()
+
+	http.Handle("/test/", b)
+	http.HandleFunc("/", mainHandler)
+	http.ListenAndServe(":8080", nil)
+}
+
+func mainHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "hello")
+
+}
