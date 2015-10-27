@@ -6,11 +6,14 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/ActiveState/tail"
 )
+
+var filename string
 
 type Broker struct {
 	clients        map[chan string]bool
@@ -88,7 +91,7 @@ func MainPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Render the template, writing to `w`.
-	host, _ := ioutil.ReadFile("/var/log/httpd/access.2015-10-27")
+	host, _ := ioutil.ReadFile(filename)
 	t.Execute(w, strings.TrimSpace(string(host)))
 
 	log.Println("Finished HTTP request at ", r.URL.Path)
@@ -96,7 +99,19 @@ func MainPageHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	tail, err := tail.TailFile("/var/log/httpd/access.2015-10-27", tail.Config{Follow: true})
+	if len(os.Args) < 2 {
+		fmt.Printf("Missing a file to tail")
+		return
+	}
+
+	filename = os.Args[1]
+
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		fmt.Printf("No such file or directory: %s", filename)
+		return
+	}
+
+	tail, err := tail.TailFile(filename, tail.Config{Follow: true})
 
 	if err != nil {
 		log.Print(err.Error())
