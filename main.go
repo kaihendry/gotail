@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
+	"strings"
 	"time"
 
 	"github.com/ActiveState/tail"
@@ -84,19 +85,18 @@ func MainPageHandler(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("templates/index.html")
 	if err != nil {
 		log.Fatal("error parsing HTML template.")
-
 	}
 
 	// Render the template, writing to `w`.
-	host, _ := os.Hostname()
-	t.Execute(w, host)
+	host, _ := ioutil.ReadFile("/var/log/httpd/access.2015-10-27")
+	t.Execute(w, strings.TrimSpace(string(host)))
 
 	log.Println("Finished HTTP request at ", r.URL.Path)
 }
 
 func main() {
 
-	tail, err := tail.TailFile("/home/hendry/irc/irc.freenode.net/#hackerspacesg/out", tail.Config{Follow: true})
+	tail, err := tail.TailFile("/var/log/httpd/access.2015-10-27", tail.Config{Follow: true})
 
 	if err != nil {
 		log.Print(err.Error())
