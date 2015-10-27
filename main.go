@@ -91,8 +91,17 @@ func MainPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Render the template, writing to `w`.
-	host, _ := ioutil.ReadFile(filename)
-	t.Execute(w, strings.TrimSpace(string(host)))
+	contents, _ := ioutil.ReadFile(filename)
+
+	data := struct {
+		Title    string
+		ReadFile string
+	}{
+		Title:    filename,
+		ReadFile: strings.TrimSpace(string(contents)),
+	}
+
+	t.Execute(w, data)
 
 	log.Println("Finished HTTP request at ", r.URL.Path)
 }

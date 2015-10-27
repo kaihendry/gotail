@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Freenode #hackerspacesg</title>
+<meta charset="utf-8" />
+<title>{{.Title}}</title>
 </head>
 <body>
 <script>
 var source = new EventSource('/tails/');
 source.onmessage = function(e) {
-	document.getElementById("log").textContent += e.data + "\n";
+	var log = document.getElementById("log");
+	log.textContent += e.data + "\n";
+	log.scrollIntoView(false);
 };
 </script>
 <pre id=log>
-{{.}}
+{{ .ReadFile }}
 </pre>
 </body>
 </html>
