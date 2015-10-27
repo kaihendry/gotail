@@ -68,7 +68,7 @@ func (b *Broker) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	for {
 		msg := <-messageChan
-		fmt.Fprintf(w, "data: Message: %s\n\n", msg)
+		fmt.Fprintf(w, "data: %s\n\n", msg)
 		f.Flush()
 	}
 
@@ -96,7 +96,7 @@ func MainPageHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	tail, err := tail.TailFile("/var/log/syslog", tail.Config{Follow: true, Location: &tail.SeekInfo{-5000, os.SEEK_END}})
+	tail, err := tail.TailFile("/home/hendry/irc/irc.freenode.net/#hackerspacesg/out", tail.Config{Follow: true})
 
 	if err != nil {
 		log.Print(err.Error())

@@ -1,21 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>HTML5 Server Side Event Example in Go</title>
+<title>Freenode #hackerspacesg</title>
 </head>
 <body>
-
-	Tailing the /var/log/syslog on the following host : {{.}}
-	/tails/ endpoint is tail -f 
-	<hr/>
-	<script type="text/javascript">
-	    // Create a new HTML5 EventSource
-	    var source = new EventSource('/tails/');
-	    // Create a callback for when a new message is received.
-	    source.onmessage = function(e) {
-	        // Append the `data` attribute of the message to the DOM.
-	        document.body.innerHTML += e.data + '<br>';
-	    };
-	</script>
+<script>
+var source = new EventSource('/tails/');
+source.onmessage = function(e) {
+	document.getElementById("log").textContent += e.data + "\n";
+};
+</script>
+<pre id=log></pre>
 </body>
 </html>
