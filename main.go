@@ -115,15 +115,11 @@ func main() {
 
 	filename = os.Args[1]
 
-	if _, err := os.Stat(filename); os.IsNotExist(err) {
-		fmt.Printf("No such file or directory: %s", filename)
-		return
-	}
-
-	tail, err := tail.TailFile(filename, tail.Config{Follow: true})
+	tail, err := tail.TailFile(filename, tail.Config{Follow: true, MustExist: true, Location: &tail.SeekInfo{0, os.SEEK_END}})
 
 	if err != nil {
 		log.Print(err.Error())
+		return
 	}
 
 	b := &Broker{
